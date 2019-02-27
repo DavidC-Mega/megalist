@@ -371,7 +371,7 @@
         itemIdsArray.forEach(function(itemId) {
             var itemIndex = self.items.indexOf(itemId);
             if (itemIndex > -1) {
-                if (self.isRendered(itemId) && self.options.appendOnly !== true) {
+                if (self.isRendered(itemId)) {
                     requiresRerender = true;
                     DOMUtils.removeNode(self._currentlyRendered[itemId]);
                     delete self._currentlyRendered[itemId];
@@ -1175,19 +1175,17 @@
         // IF initially the folder was empty, megaList may not had been rendered...so, lets check
         var requiresRerender = false;
 
-        if (self.options.appendOnly !== true) {
-            r.removed.forEach(function (itemId) {
-                var itemIndex = self.items.indexOf(itemId);
-                if (itemIndex > -1) {
-                    if (self.isRendered(itemId)) {
-                        requiresRerender = true;
-                        DOMUtils.removeNode(self._currentlyRendered[itemId]);
-                        delete self._currentlyRendered[itemId];
-                    }
-                    self.items.splice(itemIndex, 1);
+        r.removed.forEach(function (itemId) {
+            var itemIndex = self.items.indexOf(itemId);
+            if (itemIndex > -1) {
+                if (self.isRendered(itemId)) {
+                    requiresRerender = true;
+                    DOMUtils.removeNode(self._currentlyRendered[itemId]);
+                    delete self._currentlyRendered[itemId];
                 }
-            });
-        }
+                self.items.splice(itemIndex, 1);
+            }
+        });
 
         r.added.forEach(function(itemId) {
             var itemIndex = self.items.indexOf(itemId);
