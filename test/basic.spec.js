@@ -248,4 +248,61 @@ describe("Basic test", function() {
         expect($('.container .item[data-id="' + firstId + '"]').size()).to.eql(1);
         expect($('.container .item[data-id="' + firstId + '"]').text()).to.eql("Item #1, 321");
     });
+
+    it('list navigation', function() {
+        $($container).css({
+            'width': 320,
+            'height': 320
+        });
+
+        var megaList = new MegaList($container, {
+            itemWidth: 320,
+            itemHeight: 20,
+            itemRenderFunction: Fixtures.DOM.itemDOMNodeGeneratorCallback
+        });
+        // nominal 16 items in list
+
+        Fixtures.randomItemIds(megaList, 100);
+
+        // render
+        megaList.initialRender();
+
+        megaList.scrollToItem(80);
+        expect($('.container .item').last().data('id')).to.eql(80);
+
+        megaList.scrollToItem(20);
+        expect($('.container .item').first().data('id')).to.eql(20);
+
+        megaList.scrollToItem(25);
+        expect($('.container .item[data-id=25]').index()).to.eql(5);
+    });
+
+    it('grid navigation', function() {
+        $($container).css({
+            'width': 320,
+            'height': 320
+        });
+
+        var megaList = new MegaList($container, {
+            itemWidth: 80,
+            itemHeight: 80,
+            itemRenderFunction: Fixtures.DOM.itemDOMNodeGeneratorCallback
+        });
+        // nominal 4x4 grid
+
+        Fixtures.randomItemIds(megaList, 4*4*5);
+        // five pages-worth, 20 rows
+
+        // render
+        megaList.initialRender();
+
+        megaList.scrollToItem(4*14+3); // 15th row, 3rd element in row
+        expect($('.container .item').last().data('id')).to.eql(4*14+4);
+
+        megaList.scrollToItem(4*4+1); // 5th row, 1st element in row
+        expect($('.container .item').first().data('id')).to.eql(4*4+1);
+
+        megaList.scrollToItem(4*5+4); // 6th row, 4th element in row
+        expect($('.container .item[data-id=25]').index()).to.eql(8);
+    });
 });
