@@ -843,7 +843,6 @@
      */
     MegaList.prototype._recalculate = function() {
         var $listContainer = this.$listContainer;
-        var listContainer = this.listContainer;
 
         var itemWidth = this.options.itemWidth;
 
@@ -855,8 +854,8 @@
         }
 
         if (!itemWidth) {
-            itemWidth = calculated['scrollWidth']
-        };
+            itemWidth = calculated['scrollWidth'];
+        }
 
         if (!calculated['scrollHeight']) {
             calculated['scrollHeight'] = $listContainer.innerHeight();
