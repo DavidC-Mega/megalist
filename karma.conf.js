@@ -2,7 +2,7 @@
 // Generated on Mon Nov 21 2016 17:08:42 GMT+0200 (EET)
 
 var customBrowsers = (
-    process.env.BROWSERS ? process.env.BROWSERS.split(",") : ['Chrome', 'Safari', 'Firefox', 'PhantomJS']
+    process.env.BROWSERS ? process.env.BROWSERS.split(",") : ['Chrome', 'Safari', 'Firefox']
 );
 
 if (process.env.TRAVIS) {
