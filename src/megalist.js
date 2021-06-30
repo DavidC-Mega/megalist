@@ -354,7 +354,7 @@
 
         if (this._wasRendered) {
             this._contentUpdated();
-            this._applyDOMChanges();
+            this._applyDOMChanges(true);
         }
     };
 
@@ -389,7 +389,7 @@
 
             if (requiresRerender) {
                 this._repositionRenderedItems();
-                this._applyDOMChanges();
+                this._applyDOMChanges(true);
 
             }
         }
@@ -1004,13 +1004,12 @@
     /**
      * Internal method, that get called when DOM changes should be done (e.g. render new items since they got in/out
      * of the viewport)
+     *
+     * @var {bool} [contentWasUpdated] pass true to force dimension related updates
      * @private
      */
-    MegaList.prototype._applyDOMChanges = function() {
+    MegaList.prototype._applyDOMChanges = function(contentWasUpdated) {
         this._recalculate();
-
-
-        var contentWasUpdated = false;
 
         var first = this._calculated['visibleFirstItemNum'];
         var last = this._calculated['visibleLastItemNum'];
