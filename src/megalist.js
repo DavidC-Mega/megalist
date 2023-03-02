@@ -120,6 +120,12 @@
         'itemRenderFunction': false,
 
         /**
+         * An optional callback function that would be called when a DOM update is needed (triggered) on an item, which
+         * is in the viewport.
+         */
+        'itemUpdatedFunction': false,
+
+        /**
          * A Callback function, that receives 1 argument - itemID (string/int) and should remove a node out of the DOM.
          * String or a jQuery object that is the actual DOM node to be rendered/appended to the list.
          */
@@ -244,6 +250,14 @@
          */
         this._currentlyRendered = {};
 
+        /**
+         * A map of nodes, which were locally (in memory) cached, but got updated while being out of the viewport,
+         * so next time before we render them, we may need to update them.
+         *
+         * @type {{}}
+         * @private
+         */
+        this._queuedUpdates = {};
 
         /**
          * Init the render adapter
@@ -294,8 +308,8 @@
         var self = this;
         var ns = self._generateEventNamespace();
 
-        $(window).rebind("resize." + ns, SoonFc(40, self.resized.bind(self)));
-        $(document).rebind('ps-scroll-y.ps' + ns, self.throttledOnScroll.bind(self));
+        $(window).bind("resize." + ns, SoonFc(40, self.resized.bind(self)));
+        $(document).bind('ps-scroll-y.ps' + ns, self.throttledOnScroll.bind(self));
     };
 
     /**
@@ -1074,6 +1088,9 @@
                 this.content.appendChild(appendFragment);
             }
             else {
+                if (this._queuedUpdates[id] && this.options.itemUpdatedFunction) {
+                    this.options.itemUpdatedFunction(id, this._currentlyRendered[id]);
+                }
                 if (this.options.renderAdapter._repositionRenderedItem) {
                     this.options.renderAdapter._repositionRenderedItem(id);
                 }
@@ -1240,6 +1257,26 @@
             this._repositionRenderedItems();
             this._applyDOMChanges();
 
+        }
+    };
+
+    /**
+     * To be used together with 'MegaList.options.itemUpdatedFunction'.
+     * E.g. this function must be called by the code which manages the actual data (e.g. items), IF a property of a
+     * specific item, that requires re-rendering/DOM update, is being changed - the integrating code calls this
+     * and MegaList, IF needed (e.g. node is in the viewport/visible) would call `itemUpdatedFunction`
+     *
+     * @param {String} itemId
+     */
+    MegaList.prototype.itemUpdated = function(itemId) {
+        assert(this.options.itemUpdatedFunction, 'MegaList.options.itemUpdatedFunction(itemId) is required before ' +
+            'calling MegaList.itemUpdate(itemId)');
+
+        if (this._currentlyRendered[itemId]) {
+            this.options.itemUpdatedFunction(itemId, this._currentlyRendered[itemId]);
+        }
+        else {
+            this._queuedUpdates[itemId] = true;
         }
     };
 
